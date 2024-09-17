@@ -113,6 +113,10 @@ dbutils.fs.cp(srcpath,targetpath)
 
 # COMMAND ----------
 
+print(srcpath)
+
+# COMMAND ----------
+
 dbutils.fs.ls(targetpath)
 
 # COMMAND ----------
@@ -129,4 +133,16 @@ dbutils.fs.ls(targetpath)
 srcpath1 = 'dbfs:/FileStore/FileTest/test.txt'
 targetpath1 = 'dbfs:/FileStore/MovedFolder/test.txt'
 
-dbutils.fs.mv(srcpath1,targetpath1)
+dbutils.fs.mv(srcpath1,targetpath1,True)
+
+# COMMAND ----------
+
+dbutils.fs.put(srcpath1,'Hello World!',True)
+
+# COMMAND ----------
+
+dbutils.fs.rm('dbfs:/FileStore/MovedFolder')
+
+# COMMAND ----------
+
+dbutils.fs.head(srcpath)
