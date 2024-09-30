@@ -68,3 +68,75 @@ display(par_df)
 # COMMAND ----------
 
 par_df.printSchema()
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC #### Creating a temp view
+# MAGIC
+
+# COMMAND ----------
+
+par_df.createOrReplaceTempView("ParquetView")
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC
+# MAGIC UPDATE ParquetView
+# MAGIC SET Education_Level = 'School'
+# MAGIC where Education_Level = 'High School'
+
+# COMMAND ----------
+
+spark.sql("""UPDATE ParquetView
+SET Education_Level = 'School'
+where Education_Level = 'High School' """)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC
+# MAGIC ####Filter and Overwrite
+
+# COMMAND ----------
+
+df_filtered = par_df.filter("Education_Level = 'High School'")
+
+# COMMAND ----------
+
+df_filtered.display()
+
+# COMMAND ----------
+
+df_filtered.write.format("parquet").mode("overwrite").save(f'{source}/ParquetFolder') 
+
+# COMMAND ----------
+
+filtered_df = spark.read.format('parquet').load(f'{source}/ParquetFolder')
+
+# COMMAND ----------
+
+filtered_df.display()
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC
+# MAGIC ####Writing the df in Delta format
+
+# COMMAND ----------
+
+dbutils.fs.rm(f'{source}/DeltaFolder', True)
+
+# COMMAND ----------
+
+par_df.write.format('delta').mode('overwrite').save(f'{source}/DeltaFolder')
+
+# COMMAND ----------
+
+dbutils.fs.ls(f'{source}/DeltaFolder') 
+
+# COMMAND ----------
+
+spark.read.format('parquet').load('abfs://test@sivadbadls.dfs.core.windows.net/Files/DeltaFolder/part-00000-8d7c3f14-2520-4090-949a-ad8f9a5b14c2-c000.snappy.parquet').display()
